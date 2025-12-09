@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: wallet_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wallet_user
+      POSTGRES_PASSWORD: wallet_secure_password_2024
+      POSTGRES_DB: wallet_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"  # Host port 5433 maps to container port 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wallet_user -d wallet_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wallet_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  wallet_network:
+    driver: bridge
+
