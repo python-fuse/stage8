@@ -3,7 +3,9 @@
 ## Before Deployment
 
 ### 1. **Get Your Deployment URL**
+
 First, deploy to your platform to get the URL:
+
 - **Railway**: `https://your-app.up.railway.app`
 - **Render**: `https://your-app.onrender.com`
 - **Vercel**: `https://your-app.vercel.app`
@@ -24,6 +26,7 @@ First, deploy to your platform to get the URL:
 ### 3. **Set Environment Variables on Deployment Platform**
 
 **Required Variables:**
+
 ```bash
 # Database
 DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
@@ -58,11 +61,13 @@ FRONTEND_URL=https://your-frontend-url.com
 ### 5. **Run Database Migration**
 
 **Option A: Via deployment platform terminal**
+
 ```bash
 NODE_ENV=production pnpm migration:run
 ```
 
 **Option B: Locally against production DB**
+
 ```bash
 DATABASE_URL="your-neon-url" NODE_ENV=production pnpm migration:run
 ```
@@ -104,32 +109,41 @@ open https://your-deployment-url/auth/google
 7. **Run migrations** via Render shell
 
 ### Vercel (Not Recommended)
+
 This app needs persistent connections - use Railway or Render instead.
 
 ## Common Issues & Solutions
 
 ### ❌ "Redirect URI mismatch"
+
 **Solution**: Your `GOOGLE_CALLBACK_URL` doesn't match what's in Google Console
+
 1. Check your deployment URL
 2. Update Google Console with exact URL
 3. Update `GOOGLE_CALLBACK_URL` env var
 4. Redeploy
 
 ### ❌ "Database connection failed"
+
 **Solution**: Check SSL settings
+
 1. Ensure `DATABASE_URL` has `?sslmode=require`
 2. Verify Neon database is active
 3. Check if your IP is whitelisted (Neon allows all by default)
 
 ### ❌ "Migrations not running"
+
 **Solution**: Run migrations manually
+
 ```bash
 # Get shell access on your platform
 NODE_ENV=production pnpm migration:run
 ```
 
 ### ❌ "Paystack webhook not working"
-**Solution**: 
+
+**Solution**:
+
 1. Check webhook URL in Paystack dashboard
 2. Ensure URL is `https://` not `http://`
 3. Test with manual verification: `/wallet/deposit/:reference/verify`
