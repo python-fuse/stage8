@@ -16,74 +16,72 @@ export class InitialSchema1765314378505 implements MigrationInterface {
             CREATE TYPE "public"."transactions_status_enum" AS ENUM('pending', 'completed', 'failed')
         `);
 
-    // Create users table
-    await queryRunner.query(`
+        // Create users table
+        await queryRunner.query(`
             CREATE TABLE "users" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "email" character varying NOT NULL,
-                "googleId" character varying NOT NULL,
+                "google_id" character varying NOT NULL,
                 "name" character varying NOT NULL,
                 "picture" character varying,
-                "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
-                "updatedAt" TIMESTAMP NOT NULL DEFAULT now(),
+                "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+                "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
                 CONSTRAINT "UQ_users_email" UNIQUE ("email"),
-                CONSTRAINT "UQ_users_googleId" UNIQUE ("googleId"),
+                CONSTRAINT "UQ_users_google_id" UNIQUE ("google_id"),
                 CONSTRAINT "PK_users" PRIMARY KEY ("id")
             )
         `);
 
-    // Create wallets table
-    await queryRunner.query(`
+        // Create wallets table
+        await queryRunner.query(`
             CREATE TABLE "wallets" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-                "userId" uuid NOT NULL,
-                "walletNumber" character varying NOT NULL,
+                "user_id" uuid NOT NULL,
+                "wallet_number" character varying NOT NULL,
                 "balance" numeric(15,2) NOT NULL DEFAULT '0',
-                "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
-                "updatedAt" TIMESTAMP NOT NULL DEFAULT now(),
-                CONSTRAINT "UQ_wallets_walletNumber" UNIQUE ("walletNumber"),
-                CONSTRAINT "UQ_wallets_userId" UNIQUE ("userId"),
+                "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+                "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
+                CONSTRAINT "UQ_wallets_wallet_number" UNIQUE ("wallet_number"),
+                CONSTRAINT "UQ_wallets_user_id" UNIQUE ("user_id"),
                 CONSTRAINT "PK_wallets" PRIMARY KEY ("id")
             )
         `);
 
-    // Create transactions table
-    await queryRunner.query(`
+        // Create transactions table
+        await queryRunner.query(`
             CREATE TABLE "transactions" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-                "walletId" uuid NOT NULL,
+                "wallet_id" uuid NOT NULL,
                 "type" "public"."transactions_type_enum" NOT NULL,
                 "amount" numeric(15,2) NOT NULL,
                 "status" "public"."transactions_status_enum" NOT NULL DEFAULT 'pending',
                 "reference" character varying NOT NULL,
-                "recipientWalletId" uuid,
+                "recipient_wallet_id" uuid,
                 "metadata" jsonb,
-                "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
-                "updatedAt" TIMESTAMP NOT NULL DEFAULT now(),
+                "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+                "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
                 CONSTRAINT "UQ_transactions_reference" UNIQUE ("reference"),
                 CONSTRAINT "PK_transactions" PRIMARY KEY ("id")
             )
         `);
 
-    // Create api_keys table
-    await queryRunner.query(`
+        // Create api_keys table
+        await queryRunner.query(`
             CREATE TABLE "api_keys" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-                "userId" uuid NOT NULL,
+                "user_id" uuid NOT NULL,
                 "name" character varying NOT NULL,
-                "keyHash" character varying NOT NULL,
+                "key_hash" character varying NOT NULL,
                 "permissions" text NOT NULL,
-                "expiresAt" TIMESTAMP,
-                "lastUsedAt" TIMESTAMP,
-                "isActive" boolean NOT NULL DEFAULT true,
-                "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
-                "updatedAt" TIMESTAMP NOT NULL DEFAULT now(),
-                CONSTRAINT "UQ_api_keys_keyHash" UNIQUE ("keyHash"),
+                "expires_at" TIMESTAMP,
+                "last_used_at" TIMESTAMP,
+                "is_active" boolean NOT NULL DEFAULT true,
+                "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+                "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
+                CONSTRAINT "UQ_api_keys_key_hash" UNIQUE ("key_hash"),
                 CONSTRAINT "PK_api_keys" PRIMARY KEY ("id")
             )
-        `);
-
-    // Add foreign keys
+        `);    // Add foreign keys
     await queryRunner.query(`
             ALTER TABLE "wallets"
             ADD CONSTRAINT "FK_wallets_userId"
