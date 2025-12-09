@@ -22,7 +22,9 @@ import { KeysModule } from './keys/keys.module';
       password: process.env.DB_PASSWORD || 'postgres',
       database: process.env.DB_NAME || 'wallet_db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: process.env.NODE_ENV !== 'production', // Auto-sync in dev only
+      migrations: [__dirname + '/migrations/*{.ts,.js}'],
+      migrationsRun: true, // Auto-run migrations on startup
+      synchronize: false, // Disabled in favor of migrations
       logging: process.env.NODE_ENV === 'development',
     }),
     PaymentModule,
