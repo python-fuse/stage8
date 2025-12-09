@@ -28,9 +28,7 @@ import { KeysModule } from './keys/keys.module';
           ? { rejectUnauthorized: false }
           : false, // Neon requires SSL
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      migrations: [__dirname + '/migrations/*{.ts,.js}'],
-      migrationsRun: process.env.NODE_ENV !== 'production', // Auto-run in dev only
-      synchronize: false, // Never use synchronize with migrations
+      synchronize: true, // Let TypeORM auto-create schema from entities
       logging: process.env.NODE_ENV === 'development',
     }),
     PaymentModule,
