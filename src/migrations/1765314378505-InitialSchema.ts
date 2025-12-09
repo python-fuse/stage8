@@ -1,23 +1,23 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class InitialSchema1765314378505 implements MigrationInterface {
-    name = 'InitialSchema1765314378505'
+  name = 'InitialSchema1765314378505';
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        // Enable uuid extension
-        await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // Enable uuid extension
+    await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
 
-        // Create enum types
-        await queryRunner.query(`
+    // Create enum types
+    await queryRunner.query(`
             CREATE TYPE "public"."transactions_type_enum" AS ENUM('deposit', 'transfer_in', 'transfer_out')
         `);
-        
-        await queryRunner.query(`
+
+    await queryRunner.query(`
             CREATE TYPE "public"."transactions_status_enum" AS ENUM('pending', 'completed', 'failed')
         `);
 
-        // Create users table
-        await queryRunner.query(`
+    // Create users table
+    await queryRunner.query(`
             CREATE TABLE "users" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "email" character varying NOT NULL,
@@ -32,8 +32,8 @@ export class InitialSchema1765314378505 implements MigrationInterface {
             )
         `);
 
-        // Create wallets table
-        await queryRunner.query(`
+    // Create wallets table
+    await queryRunner.query(`
             CREATE TABLE "wallets" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "userId" uuid NOT NULL,
@@ -47,8 +47,8 @@ export class InitialSchema1765314378505 implements MigrationInterface {
             )
         `);
 
-        // Create transactions table
-        await queryRunner.query(`
+    // Create transactions table
+    await queryRunner.query(`
             CREATE TABLE "transactions" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "walletId" uuid NOT NULL,
@@ -65,8 +65,8 @@ export class InitialSchema1765314378505 implements MigrationInterface {
             )
         `);
 
-        // Create api_keys table
-        await queryRunner.query(`
+    // Create api_keys table
+    await queryRunner.query(`
             CREATE TABLE "api_keys" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "userId" uuid NOT NULL,
@@ -83,86 +83,92 @@ export class InitialSchema1765314378505 implements MigrationInterface {
             )
         `);
 
-        // Add foreign keys
-        await queryRunner.query(`
+    // Add foreign keys
+    await queryRunner.query(`
             ALTER TABLE "wallets"
             ADD CONSTRAINT "FK_wallets_userId"
             FOREIGN KEY ("userId") REFERENCES "users"("id")
             ON DELETE CASCADE ON UPDATE NO ACTION
         `);
 
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "transactions"
             ADD CONSTRAINT "FK_transactions_walletId"
             FOREIGN KEY ("walletId") REFERENCES "wallets"("id")
             ON DELETE CASCADE ON UPDATE NO ACTION
         `);
 
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "transactions"
             ADD CONSTRAINT "FK_transactions_recipientWalletId"
             FOREIGN KEY ("recipientWalletId") REFERENCES "wallets"("id")
             ON DELETE SET NULL ON UPDATE NO ACTION
         `);
 
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "api_keys"
             ADD CONSTRAINT "FK_api_keys_userId"
             FOREIGN KEY ("userId") REFERENCES "users"("id")
             ON DELETE CASCADE ON UPDATE NO ACTION
         `);
 
-        // Create indexes for performance
-        await queryRunner.query(`
+    // Create indexes for performance
+    await queryRunner.query(`
             CREATE INDEX "IDX_wallets_userId" ON "wallets" ("userId")
         `);
 
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE INDEX "IDX_transactions_walletId" ON "transactions" ("walletId")
         `);
 
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE INDEX "IDX_transactions_reference" ON "transactions" ("reference")
         `);
 
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE INDEX "IDX_transactions_status" ON "transactions" ("status")
         `);
 
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE INDEX "IDX_api_keys_userId" ON "api_keys" ("userId")
         `);
 
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE INDEX "IDX_api_keys_keyHash" ON "api_keys" ("keyHash")
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        // Drop indexes
-        await queryRunner.query(`DROP INDEX "public"."IDX_api_keys_keyHash"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_api_keys_userId"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_transactions_status"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_transactions_reference"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_transactions_walletId"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_wallets_userId"`);
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    // Drop indexes
+    await queryRunner.query(`DROP INDEX "public"."IDX_api_keys_keyHash"`);
+    await queryRunner.query(`DROP INDEX "public"."IDX_api_keys_userId"`);
+    await queryRunner.query(`DROP INDEX "public"."IDX_transactions_status"`);
+    await queryRunner.query(`DROP INDEX "public"."IDX_transactions_reference"`);
+    await queryRunner.query(`DROP INDEX "public"."IDX_transactions_walletId"`);
+    await queryRunner.query(`DROP INDEX "public"."IDX_wallets_userId"`);
 
-        // Drop foreign keys
-        await queryRunner.query(`ALTER TABLE "api_keys" DROP CONSTRAINT "FK_api_keys_userId"`);
-        await queryRunner.query(`ALTER TABLE "transactions" DROP CONSTRAINT "FK_transactions_recipientWalletId"`);
-        await queryRunner.query(`ALTER TABLE "transactions" DROP CONSTRAINT "FK_transactions_walletId"`);
-        await queryRunner.query(`ALTER TABLE "wallets" DROP CONSTRAINT "FK_wallets_userId"`);
+    // Drop foreign keys
+    await queryRunner.query(
+      `ALTER TABLE "api_keys" DROP CONSTRAINT "FK_api_keys_userId"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "transactions" DROP CONSTRAINT "FK_transactions_recipientWalletId"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "transactions" DROP CONSTRAINT "FK_transactions_walletId"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "wallets" DROP CONSTRAINT "FK_wallets_userId"`,
+    );
 
-        // Drop tables
-        await queryRunner.query(`DROP TABLE "api_keys"`);
-        await queryRunner.query(`DROP TABLE "transactions"`);
-        await queryRunner.query(`DROP TABLE "wallets"`);
-        await queryRunner.query(`DROP TABLE "users"`);
+    // Drop tables
+    await queryRunner.query(`DROP TABLE "api_keys"`);
+    await queryRunner.query(`DROP TABLE "transactions"`);
+    await queryRunner.query(`DROP TABLE "wallets"`);
+    await queryRunner.query(`DROP TABLE "users"`);
 
-        // Drop enum types
-        await queryRunner.query(`DROP TYPE "public"."transactions_status_enum"`);
-        await queryRunner.query(`DROP TYPE "public"."transactions_type_enum"`);
-    }
-
+    // Drop enum types
+    await queryRunner.query(`DROP TYPE "public"."transactions_status_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."transactions_type_enum"`);
+  }
 }
-

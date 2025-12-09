@@ -16,16 +16,16 @@ export class AppController {
 
   @Get('health')
   @ApiOperation({ summary: 'Health check endpoint' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Service is healthy',
     schema: {
       properties: {
         status: { type: 'string', example: 'ok' },
         timestamp: { type: 'string', example: '2025-12-09T10:30:00.000Z' },
         uptime: { type: 'number', example: 123.456 },
-      }
-    }
+      },
+    },
   })
   healthCheck() {
     return {
