@@ -108,7 +108,7 @@ export class WalletsService {
     }
 
     // Check if already processed (idempotency)
-    if (transaction.status === TransactionStatus.SUCCESS) {
+    if (transaction.status === TransactionStatus.COMPLETED) {
       // Already processed, skip
       return;
     }
@@ -135,7 +135,7 @@ export class WalletsService {
 
     try {
       // Update transaction status
-      transaction.status = TransactionStatus.SUCCESS;
+      transaction.status = TransactionStatus.COMPLETED;
       transaction.metadata = {
         ...transaction.metadata,
         paystack_data: data,
@@ -258,7 +258,7 @@ export class WalletsService {
         walletId: senderWallet.id,
         type: TransactionType.TRANSFER_OUT,
         amount,
-        status: TransactionStatus.SUCCESS,
+        status: TransactionStatus.COMPLETED,
         recipientWalletId: recipientWallet.id,
         metadata: {
           recipient_wallet_number: recipientWallet.walletNumber,
@@ -271,7 +271,7 @@ export class WalletsService {
         walletId: recipientWallet.id,
         type: TransactionType.TRANSFER_IN,
         amount,
-        status: TransactionStatus.SUCCESS,
+        status: TransactionStatus.COMPLETED,
         metadata: {
           sender_wallet_number: senderWallet.walletNumber,
         },
@@ -339,7 +339,7 @@ export class WalletsService {
     }
 
     // Check if already processed
-    if (transaction.status === TransactionStatus.SUCCESS) {
+    if (transaction.status === TransactionStatus.COMPLETED) {
       return {
         message: 'Payment already verified and credited',
         reference: transaction.reference,
@@ -377,7 +377,7 @@ export class WalletsService {
 
     try {
       // Update transaction status
-      transaction.status = TransactionStatus.SUCCESS;
+      transaction.status = TransactionStatus.COMPLETED;
       transaction.metadata = {
         ...transaction.metadata,
         paystack_verification: paystackVerification,
